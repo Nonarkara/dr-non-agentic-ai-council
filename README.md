@@ -63,6 +63,21 @@ This is the trick: **the smallest brain that can hold one specific lens reliably
 
 ---
 
+## Two modes: Council (think) and Factory (ship)
+
+The same nine bots run in **two protocols**, depending on the work:
+
+| Mode | When | How it feels |
+|---|---|---|
+| **Council** *(deliberative)* | "Should I take this contract?" / "What's the shadow here?" / "Make a podcast about waiting" *(content side)* | Lenses debate. Tenet synthesises. Decisions get pinned. Slow, transparent, trust-the-room. |
+| **Factory** *(reactive)* | Daily podcast pipeline. Scheduled videos. Recurring image batches. *"Make a podcast about waiting"* *(rendering side)*. | Router → Blackboard → Workers → Ship → QA. Fast, stateless, fail-fast-and-degrade. |
+
+Council is jazz. Factory is an assembly line. Same musicians, two stages.
+
+→ Full factory architecture: [`docs/12-factory-floor.md`](docs/12-factory-floor.md).
+
+---
+
 ## What you need
 
 | Thing | Why | Cost |
@@ -199,6 +214,7 @@ Full step-by-step: [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md).
 | [`docs/10-obsidian-brain.md`](docs/10-obsidian-brain.md) | The Obsidian vault as long-term memory — `agentic-ai-research/brain-vault` + `Nonarkara/second-brain-v2` |
 | [`docs/11-storytelling-patterns.md`](docs/11-storytelling-patterns.md) | Escaping the *"I remember standing on a corner…"* LLM cliché — mine your own openings, load them as a brain reference |
 | [`docs/diagrams.md`](docs/diagrams.md) | All 6 architecture diagrams in GitHub-rendered Mermaid — system map, turn flow, roles, engine ladder, routing tree, memory flow |
+| [`docs/12-factory-floor.md`](docs/12-factory-floor.md) | The **executor mode** — same nine bots, reactive pipeline (Router → Blackboard → Workers → Ship → QA). Use the council to *think*; use the factory to *ship* |
 | [`HISTORY.md`](HISTORY.md) | How this got built — twelve days from "bored in a Singapore hotel" to a 9-bot daily-use council |
 | [`COSTS.md`](COSTS.md) | Real May 2026 monthly bill breakdown |
 | [`examples/`](examples/) | Sanitised configs, persona prompts, SOUL templates |
