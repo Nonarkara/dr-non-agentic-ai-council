@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
-"""End-to-end demo: Router → Blackboard → Voice Synthesizer → ship.
+"""End-to-end demo: Router → Script Factory → Voice Synthesizer → ship.
 
 Usage:
-  cd examples/factory
+  cd examples/
   python3 -m factory.run --request "podcast ep019 about EU AI Act"
 
 Env required:
-  OPENAI_API_KEY      — Router uses gpt-4o-mini
+  OPENAI_API_KEY      — Router + Script Factory use gpt-4o-mini
   ELEVENLABS_API_KEY  — Voice Synth uses ElevenLabs
   ELEVEN_VOICE_ID     — your primary voice id
   ELEVEN_FALLBACK_VOICE_IDS  — comma-separated fallback chain (optional)
 
+Flags:
+  --dry-route     Router only (no LLM script, no audio)
+  --dry-script    Router + Script Factory (no audio spend)
+
 What this demo does NOT do:
-  - Run a real Research worker (we stub script segments inline below).
+  - Run a real Research worker (no Perplexity / search calls).
   - Run a real Integration worker (no concat, no normalisation, no CDN
     upload). Just leaves the per-segment MP3s on disk.
   - Run a Video Renderer / Visual Director / Thumbnail worker.
@@ -31,25 +35,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from factory import blackboard, router
-from factory.workers import voice_synth
-
-
-# A stub Script Factory output — what a real Script worker would produce.
-# Replace with a call to your script-drafter LLM (see docs/11-storytelling-patterns.md
-# for the prompt-engineering side).
-DEMO_SEGMENTS = [
-    {
-        "segment_id": "demo_seg01",
-        "type": "intro",
-        "text": "Welcome to the Factory Floor demo. This is segment one — short, "
-                "deliberately under three seconds so the test runs cheap.",
-    },
-    {
-        "segment_id": "demo_seg02",
-        "type": "main",
-        "text": "Segment two. The point of this demo is the protocol, not the script.",
-    },
-]
+from factory.workers import script_factory, voice_synth
 
 
 def main() -> int:
@@ -64,22 +50,29 @@ def main() -> int:
                         "Default: ~/.openclaw/factory/")
     p.add_argument("--dry-route", action="store_true",
                    help="Run Router only; don't invoke any worker.")
+    p.add_argument("--dry-script", action="store_true",
+                   help="Run Router + Script Factory but skip Voice Synth "
+                        "(useful for checking the script without spending ElevenLabs quota).")
     args = p.parse_args()
 
     work_dir = Path(args.work_dir).expanduser() if args.work_dir else None
 
-    # Precondition checks — surface MISSING credentials early, before
-    # any LLM calls.
+    # Precondition checks — surface missing credentials early.
     if not os.environ.get("OPENAI_API_KEY"):
-        print("ERROR: OPENAI_API_KEY missing", file=sys.stderr); return 2
+        print("ERROR: OPENAI_API_KEY missing", file=sys.stderr)
+        return 2
 
+    # ------------------------------------------------------------------
     # 1. Init blackboard
-    print(f"[1/3] Init blackboard for project={args.project_id!r}")
-    state = blackboard.init(args.project_id, args.request, work_dir=work_dir)
+    # ------------------------------------------------------------------
+    print(f"[1/4] Init blackboard for project={args.project_id!r}")
+    blackboard.init(args.project_id, args.request, work_dir=work_dir)
     print(f"  ✓ blackboard at {blackboard._path(args.project_id, work_dir)}")
 
+    # ------------------------------------------------------------------
     # 2. Router classifies + decides
-    print(f"\n[2/3] Router decides…")
+    # ------------------------------------------------------------------
+    print(f"\n[2/4] Router decides…")
     decision = router.route(args.project_id, args.request, work_dir=work_dir)
     print(f"  task_type:    {decision['task_type']}")
     print(f"  pipeline:     {decision['pipeline']}")
@@ -92,41 +85,84 @@ def main() -> int:
 
     if args.dry_route:
         print("  --dry-route: stopping after Router as requested.")
+        _print_final(args.project_id, work_dir)
         return 0
 
-    # 3. Voice Synthesizer worker (the only worker wired up in this demo)
-    print(f"\n[3/3] Voice Synthesizer renders {len(DEMO_SEGMENTS)} segments…")
+    # ------------------------------------------------------------------
+    # 3. Script Factory drafts the script
+    # ------------------------------------------------------------------
+    print(f"\n[3/4] Script Factory drafts script…")
+    segments = script_factory.draft_script(
+        args.project_id,
+        args.request,
+        work_dir=work_dir,
+    )
+    state = blackboard.read(args.project_id, work_dir=work_dir)
+    script_art = state.get("artifacts", {}).get("script", {})
+    is_stub = script_art.get("is_stub", False)
+    n_segs = script_art.get("n_segments", len(segments))
+    total_s = script_art.get("total_duration_estimate_s", 0)
+    opening = script_art.get("opening_shape_used", "unknown")
+
+    print(f"  segments:     {n_segs}")
+    print(f"  duration est: ~{total_s}s")
+    print(f"  opening:      {opening}")
+    if is_stub:
+        print(f"  ⚠ stub script — LLM call failed; see blackboard errors")
+
+    if args.dry_script:
+        print("  --dry-script: stopping before Voice Synth as requested.")
+        print()
+        print("  Script preview:")
+        for seg in segments:
+            print(f"    [{seg['type']}] {seg['text'][:80]}…"
+                  if len(seg['text']) > 80 else f"    [{seg['type']}] {seg['text']}")
+        _print_final(args.project_id, work_dir)
+        return 0
+
+    # ------------------------------------------------------------------
+    # 4. Voice Synthesizer renders the segments
+    # ------------------------------------------------------------------
+    print(f"\n[4/4] Voice Synthesizer renders {len(segments)} segments…")
     if not os.environ.get("ELEVENLABS_API_KEY"):
-        print("  ! ELEVENLABS_API_KEY missing — cannot run worker. Demo will")
-        print("  ! mark all segments as missing and exit successfully (the")
-        print("  ! factory pattern: degrade gracefully, never block the chain).")
+        print("  ! ELEVENLABS_API_KEY missing — skipping Voice Synth.")
+        print("  ! (factory pattern: degrade gracefully, never block)")
+        _print_final(args.project_id, work_dir)
+        return 0
+
     primary = os.environ.get("ELEVEN_VOICE_ID", "")
-    fallbacks = [v.strip() for v in os.environ.get("ELEVEN_FALLBACK_VOICE_IDS", "").split(",")
-                 if v.strip()]
     if not primary:
-        print("  ! ELEVEN_VOICE_ID missing — same as above; demo skips synth.")
+        print("  ! ELEVEN_VOICE_ID missing — skipping Voice Synth.")
+        _print_final(args.project_id, work_dir)
+        return 0
 
-    if primary and os.environ.get("ELEVENLABS_API_KEY"):
-        artifact = voice_synth.synthesize(
-            args.project_id, DEMO_SEGMENTS,
-            primary_voice_id=primary,
-            fallback_voice_ids=fallbacks,
-            work_dir=work_dir,
-        )
-        print(f"  rendered: {artifact['n_rendered']}/{artifact['n_segments']} segments")
-        print(f"  voice:    {artifact['voice_used']}")
-        if artifact["missing"]:
-            print(f"  missing:  {len(artifact['missing'])} segments — see blackboard")
+    fallbacks = [v.strip() for v in
+                 os.environ.get("ELEVEN_FALLBACK_VOICE_IDS", "").split(",")
+                 if v.strip()]
 
-    # Final state read
-    final = blackboard.read(args.project_id, work_dir=work_dir)
+    artifact = voice_synth.synthesize(
+        args.project_id, segments,
+        primary_voice_id=primary,
+        fallback_voice_ids=fallbacks,
+        work_dir=work_dir,
+    )
+    print(f"  rendered: {artifact['n_rendered']}/{artifact['n_segments']} segments")
+    print(f"  voice:    {artifact['voice_used']}")
+    if artifact["missing"]:
+        print(f"  missing:  {len(artifact['missing'])} segments — see blackboard")
+
+    _print_final(args.project_id, work_dir)
+    return 0
+
+
+def _print_final(project_id: str, work_dir: Path | None) -> None:
+    final = blackboard.read(project_id, work_dir=work_dir)
     print(f"\n=== Final blackboard state ===")
     print(f"  status:       {final['status']}")
     print(f"  cost:         ${final['cost_tracker']['estimated_usd']:.4f}")
     print(f"  api_calls:    {final['cost_tracker']['api_calls']}")
     print(f"  errors:       {len(final['errors'])} logged")
-    print(f"\nFull state: {blackboard._path(args.project_id, work_dir)}")
-    return 0
+    print(f"\nFull state: {blackboard._path(project_id, work_dir)}")
 
 
 if __name__ == "__main__":

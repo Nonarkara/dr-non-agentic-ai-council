@@ -2,32 +2,33 @@
 
 > Minimal, runnable scaffold for the executor-mode protocol described in [`../../docs/12-factory-floor.md`](../../docs/12-factory-floor.md).
 >
-> ~400 lines of Python total, no extra dependencies beyond `urllib` (stdlib). Drop-in alongside the existing `tiktok-wisdom` skill.
+> ~550 lines of Python total, no extra dependencies beyond `urllib` (stdlib). Drop-in alongside the existing `tiktok-wisdom` skill.
 
 ## What's here
 
 ```
 examples/factory/
 ├── blackboard.py          ← shared JSON state store (file-backed)
-├── router.py              ← Router agent — gpt-4o-mini classifier
+├── router.py              ← Router agent — gpt-4o-mini GO/BLOCK classifier
 ├── workers/
 │   ├── __init__.py
+│   ├── script_factory.py  ← Script Factory worker — drafts segments via LLM
 │   └── voice_synth.py     ← Voice Synthesizer worker — direct ElevenLabs API
 └── run.py                 ← end-to-end demo orchestrator
 ```
 
-That's the smallest end-to-end shape that proves the protocol works:
+The full pipeline:
 
-- Router classifies a request and writes a routing decision to the blackboard.
-- The blackboard is a simple JSON file — no Redis, no DB, no Telegram chat.
-- Voice Synthesizer reads its task from the blackboard, calls ElevenLabs directly with retry+fallback, writes audio paths back to the blackboard.
-- All errors go to `state["errors"]` for post-hoc QA.
-- All API costs are tracked in `state["cost_tracker"]`.
+1. **Router** classifies the request (task type, pipeline, auto_ship, cost estimate) and writes to the blackboard.
+2. **Script Factory** reads the routing artifact + any research context, loads Dr Non's storytelling brain (`~/Brain/TemporalLobe/storytelling/`), calls gpt-4o-mini, and writes 3–10 segments to `artifacts["script"]`.
+3. **Voice Synthesizer** reads `artifacts["script"]`, calls ElevenLabs with retry+fallback, writes MP3 paths to `artifacts["audio"]`.
+4. All errors go to `state["errors"]` for post-hoc QA. All costs tracked in `state["cost_tracker"]`.
+
+The storytelling brain is optional — if `~/Brain/TemporalLobe/storytelling/` isn't present, Script Factory uses a compact built-in style block. The pipeline degrades gracefully in both cases.
 
 What's deliberately NOT here:
 
 - A real Research worker (in production, calls Perplexity / GPT-4o + search).
-- A Script Factory that writes the segments (this demo hardcodes two stub segments).
 - Visual Director / Video Renderer (~150 LOC each, same shape).
 - Integration worker (FFmpeg concat + normalisation + tag injection + CDN upload).
 - QA worker (post-hoc audit).
@@ -41,27 +42,30 @@ The pattern for adding any of those: same shape as `voice_synth.py` — a single
 # Python 3.11+ (uses tomllib + modern syntax)
 python3 --version
 
-# These two env vars are essential:
+# Essential — Router + Script Factory:
 export OPENAI_API_KEY=sk-...
+
+# For Voice Synth (optional — pipeline degrades gracefully without these):
 export ELEVENLABS_API_KEY=sk_...
 export ELEVEN_VOICE_ID=<your_voice_id>
-
-# Optional but recommended — fallback voice chain for graceful degradation:
-export ELEVEN_FALLBACK_VOICE_IDS=<id1>,<id2>
+export ELEVEN_FALLBACK_VOICE_IDS=<id1>,<id2>   # optional fallback chain
 ```
 
-If you don't have an ElevenLabs key, the demo still runs — it'll just log "ELEVENLABS_API_KEY missing" and exit cleanly without invoking the worker. That's the factory pattern: missing dependencies degrade gracefully; they don't crash.
+If you don't have an ElevenLabs key, the demo still runs: Router classifies and Script Factory drafts the script, then the voice step logs "ELEVENLABS_API_KEY missing" and exits cleanly. That's the factory pattern — missing dependencies degrade gracefully, never crash.
 
 ## Run the demo
 
 ```bash
-cd examples/factory
+cd examples/   # NOT examples/factory — run as a module from examples/
 
-# Full pipeline — Router decides, Voice worker runs:
+# Full pipeline — Router → Script → Voice:
 python3 -m factory.run --request "podcast ep019 about EU AI Act"
 
-# Router-only dry-run (no API spend on workers):
+# Router-only dry-run (zero API cost beyond gpt-4o-mini classify):
 python3 -m factory.run --request "podcast ep019 about EU AI Act" --dry-route
+
+# Router + Script Factory only (see the script, skip ElevenLabs spend):
+python3 -m factory.run --request "wisdom video about patience" --dry-script
 
 # Custom project id + work dir:
 python3 -m factory.run \
@@ -70,28 +74,37 @@ python3 -m factory.run \
   --work-dir /tmp/factory-test
 ```
 
-Expected output:
+Expected output (`--dry-script` run):
 
 ```
-[1/3] Init blackboard for project='demo001'
+[1/4] Init blackboard for project='demo001'
   ✓ blackboard at /Users/.../.openclaw/factory/demo001.json
 
-[2/3] Router decides…
-  task_type:    podcast
-  pipeline:     podcast
+[2/4] Router decides…
+  task_type:    video
+  pipeline:     video
   auto_ship:    True
-  estimated:    $0.50
+  estimated:    $0.25
 
-[3/3] Voice Synthesizer renders 2 segments…
-  rendered: 2/2 segments
-  voice:    primary
+[3/4] Script Factory drafts script…
+  segments:     4
+  duration est: ~85s
+  opening:      Shape 1
+
+  Script preview:
+    [intro] People ask me all the time — how do you stay patient when the
+    [main] Patience isn't passive. It's the…
+    [main] The Stoics called it…
+    [outro] So the next time you feel the urge to rush…
 
 === Final blackboard state ===
-  status:       voiced
-  cost:         $0.0142
-  api_calls:    {'openai': 1, 'elevenlabs': 2}
+  status:       scripted
+  cost:         $0.0008
+  api_calls:    {'openai': 2}
   errors:       0 logged
 ```
+
+Full pipeline with voice adds `[4/4] Voice Synthesizer renders N segments…`.
 
 After the run, peek at the state JSON:
 
@@ -103,38 +116,33 @@ You'll see the full audit trail: routing decision, audio file paths, cost breakd
 
 ## How to extend — adding the next worker
 
-The pattern is consistent. Here's the shape for a Script Factory worker:
+`script_factory.py` is already wired in. The next natural addition is a **Research worker** that fetches context before the script is drafted:
 
 ```python
-# examples/factory/workers/script_factory.py
+# examples/factory/workers/research.py
 from .. import blackboard
 
-def draft_script(project_id, topic, *, work_dir=None,
-                 openai_api_key=None, segments_target=4):
-    blackboard.update_status(project_id, "scripting", work_dir=work_dir)
+def fetch(project_id, topic, *, work_dir=None, perplexity_api_key=None):
+    blackboard.update_status(project_id, "researching", work_dir=work_dir)
 
-    # 1. Read research artefact (if a Research worker ran already)
-    state = blackboard.read(project_id, work_dir=work_dir)
-    research = state["artifacts"].get("research", {})
+    # 1. Call your search API (Perplexity, Tavily, etc.)
+    notes, usd = _call_search_api(topic, perplexity_api_key)
+    blackboard.add_cost(project_id, api_call="perplexity", usd=usd,
+                        work_dir=work_dir)
 
-    # 2. Call your LLM. Track cost.
-    segments = _call_llm_for_segments(topic, research, openai_api_key)
-    blackboard.add_cost(project_id, llm_tokens=..., usd=..., work_dir=work_dir)
-
-    # 3. Write the artefact and update status.
-    blackboard.add_artifact(project_id, "script",
-                            {"segments": segments,
-                             "n_segments": len(segments)},
+    # 2. Write the artefact. Script Factory will pick it up automatically.
+    blackboard.add_artifact(project_id, "research",
+                            {"notes": notes, "query": topic},
                             work_dir=work_dir)
-    blackboard.update_status(project_id, "scripted", work_dir=work_dir)
-    return segments
+    blackboard.update_status(project_id, "researched", work_dir=work_dir)
+    return notes
 ```
 
 Three rules every worker follows:
 
-1. **Read the blackboard, don't pass arguments.** If you need research output, read it from `state["artifacts"]["research"]`.
+1. **Read the blackboard, don't pass arguments.** If you need a prior worker's output, read it from `state["artifacts"]["<key>"]`.
 2. **Track every API call's cost.** `blackboard.add_cost(..., usd=...)` so the Router can enforce budget caps next time.
-3. **Log errors, don't raise.** Catch exceptions, call `blackboard.log_error(...)`, fall back to a degraded output (silence-stub audio, last-good-frame video, etc.). The pipeline ships.
+3. **Log errors, don't raise.** Catch exceptions, call `blackboard.log_error(...)`, fall back to a degraded output (stub notes, silence-gap audio, last-good-frame video, etc.). The pipeline ships.
 
 ## Why a JSON file instead of Redis
 
