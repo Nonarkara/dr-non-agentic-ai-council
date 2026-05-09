@@ -57,24 +57,7 @@ Manus.ai gives you a single big agent that does everything by burning a lot of G
 
 A council does the opposite: **break a hard question into eight specialised lenses, each a small model, each cheap.** Then a chair (Tenet) synthesises. The result is often *better* than one giant model, because the room catches what one perspective misses — and you can read the deliberation log to know why.
 
-```
-ONE BIG MODEL (Manus-style):                    NINE SMALL SPECIALISTS (this council):
-
-      ┌──────────────────────┐                    ┌─────┐ ┌─────┐ ┌─────┐
-      │                      │                    │ Ana │ │Civic│ │Hann.│
-      │   $$$$$  GPU CLUSTER │                    └──┬──┘ └──┬──┘ └──┬──┘
-      │                      │                       └──────┬┴───────┘
-      │  one opinion per Q   │                              ▼
-      │                      │                        ┌──────────┐
-      └──────────────────────┘                        │  Tenet   │
-                                                      │ synthesise│
-                                                      └────┬──────┘
-       slow, expensive,                                    ▼
-       opaque                                          ┌──────┐
-                                                       │ Otto │ → ship
-                                                       └──────┘
-                                                fast, cheap, transparent
-```
+<p align="center"><img src="diagrams/divide-and-conquer.png" alt="Divide and conquer beats throwing compute at it — one big GPU-cluster model with one opinion per Q vs. nine small specialists (Ana, Civic, Hannah, …) routed through Tenet's synthesis to Otto who ships" width="900" /></p>
 
 This is the trick: **the smallest brain that can hold one specific lens reliably is much cheaper than the biggest brain trying to hold all eight.** And when each bot's lens is locked in via a SOUL prompt, you get specialisation without retraining.
 
