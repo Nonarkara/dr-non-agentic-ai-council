@@ -1,0 +1,66 @@
+{
+  "_comment": "Template nanobot config. Replace ALL <PLACEHOLDER> values. Never commit a real config — it has your bot token.",
+
+  "agents": {
+    "defaults": {
+      "workspace": "<HOME>/.nanobot-<bot>/workspace",
+      "model": "dashscope/qwen-flash",
+      "maxTokens": 4096,
+      "temperature": 0.7,
+      "maxToolIterations": 40
+    }
+  },
+
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "token": "<YOUR_BOT_TOKEN_FROM_BOTFATHER>",
+      "allowFrom": [
+        "<YOUR_USER_ID>",
+        "<YOUR_GROUP_CHAT_ID>"
+      ]
+    }
+  },
+
+  "providers": {
+    "dashscope": {
+      "apiKey": "<YOUR_DASHSCOPE_API_KEY>",
+      "apiBase": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1"
+    },
+    "groq": {
+      "apiKey": "<YOUR_GROQ_API_KEY>",
+      "apiBase": null
+    },
+    "openrouter": {
+      "apiKey": "<YOUR_OPENROUTER_API_KEY>",
+      "apiBase": null
+    },
+    "openai": {
+      "_comment": "We hijack the openai provider field to point at NVIDIA NIM (OpenAI-compatible).",
+      "apiKey": "<YOUR_NVIDIA_API_KEY>",
+      "apiBase": "https://integrate.api.nvidia.com/v1"
+    },
+    "gemini": {
+      "apiKey": "<YOUR_GEMINI_API_KEY>",
+      "apiBase": null
+    }
+  },
+
+  "gateway": {
+    "host": "0.0.0.0",
+    "port": 18790
+  },
+
+  "tools": {
+    "web": {
+      "search": {
+        "apiKey": "<YOUR_FIRECRAWL_API_KEY_OPTIONAL>",
+        "maxResults": 5
+      }
+    },
+    "exec": {
+      "timeout": 60,
+      "restrictToWorkspace": false
+    }
+  }
+}

@@ -1,0 +1,37 @@
+# Never commit credentials
+*.env
+.env
+.env.*
+*credentials*
+*token*.txt
+*api-key*
+*-bot-token.txt
+
+# Don't commit per-bot configs (they have tokens)
+config.json
+nanobot-config-actual*.json
+
+# OS / editor noise
+.DS_Store
+*.pyc
+__pycache__/
+.venv/
+venv/
+.idea/
+.vscode/
+
+# Generated stuff
+*.mp3
+*.mp4
+*.png
+*.jpg
+*.jpeg
+
+# But DO commit hero diagrams + screenshots in diagrams/
+!diagrams/*.png
+!diagrams/*.jpg
+!diagrams/*.jpeg
+
+# Backups created by scripts
+*.bak
+*.bak.*
