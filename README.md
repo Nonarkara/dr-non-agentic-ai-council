@@ -6,6 +6,8 @@
 
 <p align="center"><img src="diagrams/hero-banner.png" alt="Dr Non Agentic AI Council — natural-language coding orchestrates a DIY council of collaborative AI agents" /></p>
 
+<p align="center"><img src="diagrams/01_system_map.svg" alt="Dr Non Agentic AI Council — System Map" width="900" /></p>
+
 ---
 
 ## The 30-second pitch
@@ -22,42 +24,7 @@ This repo is the playbook. → [How it got built, day by day](HISTORY.md) — tw
 
 ## What's actually inside
 
-```
-                       ┌──────────────────────────────────────────┐
-                       │     YOU  (Telegram message)              │
-                       └────────────────────┬─────────────────────┘
-                                            │
-                       ┌────────────────────▼─────────────────────┐
-                       │   Tenet  (Chair / Devil's Advocate)      │
-                       │   Routes · synthesizes · pins decisions  │
-                       └────────────────────┬─────────────────────┘
-                                            │
-        ┌───────────────────────────────────┼───────────────────────────────────┐
-        │                                   │                                   │
-        ▼                                   ▼                                   ▼
-   ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
-   │  Ana    │    │  Civic  │    │ Hannah  │    │   Bob   │    │   Pip   │
-   │ Kantian │    │  Mill   │    │ Douglas │    │  Freud  │    │  Rams   │
-   │         │    │ Lewis   │    │ Tversky │    │ Holmes  │    │ Vignelli│
-   └────┬────┘    └────┬────┘    └────┬────┘    └────┬────┘    └────┬────┘
-        │              │              │              │              │
-        └──────────────┴──────────────┼──────────────┴──────────────┘
-                                      │  (the 8 thinkers — debate, EXPAND/QUALIFY/CONCEDE/STAND/PASS)
-                                      │
-                                      ▼
-                       ┌──────────────────────────────────┐
-                       │   Otto  (Executor — tool access) │
-                       │  OCRs cards · downloads videos · │
-                       │  saves to Drive · sends emails · │
-                       │  publishes PDFs · runs skills    │
-                       └──────────────────────────────────┘
-                                      │
-                                      ▼
-                       ┌──────────────────────────────────┐
-                       │  Radar  (Secretary — keeps room  │
-                       │  moving · scribes · summarises)  │
-                       └──────────────────────────────────┘
-```
+<p align="center"><img src="diagrams/03_roles.svg" alt="The Council — Who Does What" width="900" /></p>
 
 Plus **noN** — the Carl-Jung-shadow easter-egg who only speaks when the others miss what they don't want to see.
 
@@ -152,6 +119,8 @@ Pick the smallest engine that does the job. **Don't run hermes when picoclaw wil
 
   cheaper, simpler ◄────────────────────────────── more capable
 ```
+
+<p align="center"><img src="diagrams/04_engine_ladder.svg" alt="Engine Ladder — Pick the Smallest Thing That Works" width="900" /></p>
 
 ---
 
@@ -258,6 +227,7 @@ Full step-by-step: [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md).
 | [`docs/09-failure-modes.md`](docs/09-failure-modes.md) | What goes wrong, what to do, how the SOULs prevent it |
 | [`docs/10-obsidian-brain.md`](docs/10-obsidian-brain.md) | The Obsidian vault as long-term memory — `agentic-ai-research/brain-vault` + `Nonarkara/second-brain-v2` |
 | [`docs/11-storytelling-patterns.md`](docs/11-storytelling-patterns.md) | Escaping the *"I remember standing on a corner…"* LLM cliché — mine your own openings, load them as a brain reference |
+| [`docs/diagrams.md`](docs/diagrams.md) | All 6 architecture diagrams in GitHub-rendered Mermaid — system map, turn flow, roles, engine ladder, routing tree, memory flow |
 | [`HISTORY.md`](HISTORY.md) | How this got built — twelve days from "bored in a Singapore hotel" to a 9-bot daily-use council |
 | [`COSTS.md`](COSTS.md) | Real May 2026 monthly bill breakdown |
 | [`examples/`](examples/) | Sanitised configs, persona prompts, SOUL templates |
