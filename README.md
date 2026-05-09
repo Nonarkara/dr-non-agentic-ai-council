@@ -108,18 +108,6 @@ The council is an *interface*. The brains live in four open-source frameworks Dr
 
 Pick the smallest engine that does the job. **Don't run hermes when picoclaw will do.**
 
-```
-                  more moving parts ──────────────────────────────►
-
-  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌──────────┐
-  │ picoclaw │ →  │ nanobot  │ →  │ openclaw │ →  │  hermes  │
-  └──────────┘    └──────────┘    └──────────┘    └──────────┘
-   one job          one bot          skills          full agent
-   no tools         light tools      heavy work      long memory
-
-  cheaper, simpler ◄────────────────────────────── more capable
-```
-
 <p align="center"><img src="diagrams/04_engine_ladder.svg" alt="Engine Ladder — Pick the Smallest Thing That Works" width="900" /></p>
 
 ---
