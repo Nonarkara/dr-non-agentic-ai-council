@@ -197,6 +197,42 @@ Full step-by-step: [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md).
 
 ---
 
+## What a summer of running it unattended actually taught me
+
+Building this is the easy half. Keeping it alive on one laptop, overnight,
+without a human watching, is where the real lessons are — and almost none of
+them were in the code I thought I was debugging.
+
+A sample of what's in [`docs/13-operating-it-for-real.md`](docs/13-operating-it-for-real.md):
+
+- **The health check that lied.** A monitor logged `OK: alive` every five
+  minutes straight through a total outage, because it probed an endpoint that
+  answers instantly whether or not inference works. *A probe must exercise the
+  path that breaks.*
+- **The probe that caused the outage it was detecting.** Fixing the above meant
+  running real inference — which loads a 3GB model and pins it for five
+  minutes. On a 16GB machine, the health check was starving the very service
+  it existed to protect. *A check that reserves a resource is part of the
+  system it measures.*
+- **198 restarts that restarted nothing.** `open -a App` is a no-op when the
+  app is already running, and the kill list only had the child process. The
+  parent survived, nothing respawned, and it repeated all day — silently.
+- **A full disk broke the local models.** Generation failed with
+  `Remote end closed connection`. Every model-side theory was wrong: swap
+  lives on the boot volume, the disk was at 1.4GB, and the KV-cache allocation
+  had nowhere to grow. *Check `df` before you touch model parameters.*
+- **Free tiers are not redundancy.** Three free providers is one failure mode
+  wearing three hats. Count independent failure modes, not vendors.
+- **Resumability makes retries free.** Skip to the expensive intermediate if it
+  already exists, and a nightly job can safely retry four times before
+  delivery instead of missing a morning.
+
+The through-line: **the failure is almost never where the alarm is pointing**,
+and nearly every bug shared one shape — *something reported success while doing
+nothing useful.*
+
+---
+
 ## What this repo contains
 
 | File | What |
@@ -215,6 +251,7 @@ Full step-by-step: [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md).
 | [`docs/11-storytelling-patterns.md`](docs/11-storytelling-patterns.md) | Escaping the *"I remember standing on a corner…"* LLM cliché — mine your own openings, load them as a brain reference |
 | [`docs/diagrams.md`](docs/diagrams.md) | All 6 architecture diagrams in GitHub-rendered Mermaid — system map, turn flow, roles, engine ladder, routing tree, memory flow |
 | [`docs/12-factory-floor.md`](docs/12-factory-floor.md) | The **executor mode** — same nine bots, reactive pipeline (Router → Blackboard → Workers → Ship → QA). Use the council to *think*; use the factory to *ship* |
+| [`docs/13-operating-it-for-real.md`](docs/13-operating-it-for-real.md) | **The field report.** A summer of running this unattended: 13 real incidents, each with its root cause — the health check that lied, the probe that caused the outage it was detecting, the 198 restarts that restarted nothing, and the full disk that broke the local models |
 | [`HISTORY.md`](HISTORY.md) | How this got built — twelve days from "bored in a Singapore hotel" to a 9-bot daily-use council |
 | [`COSTS.md`](COSTS.md) | Real May 2026 monthly bill breakdown |
 | [`examples/`](examples/) | Sanitised configs, persona prompts, SOUL templates |
