@@ -1,274 +1,199 @@
+![Nine specialists around one Mac in a Bangkok studio — rain on the river, ink, maps, a small robot, two ink-wash familiars. Illustration only; no interface and no title card.](docs/hero-banner.png)
+
+A council around one laptop, a city outside the window. The banner is illustration only — no live UI, no HUD, no title overlay.
+
 # Dr Non's Agentic AI Council
 
-> Manus-class team thinking, on one Mac, for **~$0–25 a month**.
-> No supercomputer. No GPU farm. No subscription stack.
-> Just nine specialists in a Telegram group chat — divide, conquer, integrate.
+**A nine-lens council pattern that runs on one Mac — divide, deliberate, then ship.**
 
-<p align="center"><img src="diagrams/hero-banner.png" alt="Dr Non Agentic AI Council — natural-language coding orchestrates a DIY council of collaborative AI agents" /></p>
+[![License: MIT](https://img.shields.io/badge/license-MIT-1A1A1A)](LICENSE)
 
-<p align="center"><img src="diagrams/01_system_map.svg" alt="Dr Non Agentic AI Council — System Map" width="900" /></p>
+**Author.** [Non Arkaraprasertkul](https://github.com/Nonarkara) (Nonarkara) — architect, urban anthropologist, civic-studio practice at **Axiom X Co., Ltd.**, Bangkok.
 
----
+Independent. Written for a **Thai–English** audience. Not an official depa, ASEAN, or municipal product.
 
-## The 30-second pitch
-
-Most AI products give you **one model giving you one answer.** That's an opinion, not a deliberation.
-
-I wanted a room. Eight thinkers who'd push back on each other — Stoic, Kantian, Utilitarian, Pattern-anthropologist, Designer, Generalist, First-principles devil's advocate, Carl-Jung-shadow easter-egg — plus an Executor who'd actually do the work, and a Secretary who'd keep the room moving.
-
-I built it. It runs on my MacBook. It costs **~$0/month if you tolerate the free tiers, ~$15-25/month if you want it boringly reliable.** No GPU. No cluster. No Manus.ai subscription.
-
-This repo is the playbook. → [How it got built, day by day](HISTORY.md) — twelve days from "bored in a Singapore hotel room" to today.
+เก้าเลนส์ในห้องแชทเดียวกัน รันบนแมคเครื่องเดียว — วิธีคิดแบบสภา ไม่ใช่กล่องดำ
 
 ---
 
-## What's actually inside
+## What this is
 
-<p align="center"><img src="diagrams/03_roles.svg" alt="The Council — Who Does What" width="900" /></p>
+A **playbook** for a room of specialised AI bots that argue before they act.
 
-Plus **noN** — the Carl-Jung-shadow easter-egg who only speaks when the others miss what they don't want to see.
+Most AI products give you one model and one answer. That is an opinion, not a deliberation. This repo writes down a different shape: nine justices in one Telegram group, each locked to a lens, a chair who synthesises, an executor who ships artefacts, and a scribe who keeps a file. The room is the audit log.
 
----
+This tree is documentation, sanitised templates, and a small factory scaffold. It is **not** a hosted product and **not** a running council. The bots, tokens, and personal vault stay on the operator's machine.
 
-## What it actually looks like
+**What is actually here**
 
-<table>
-<tr>
-<td width="33%" valign="top">
-<img src="diagrams/council-members.png" alt="The 15-member council in Telegram, each bot tagged with its engine and model" />
-<p align="center"><b>The room.</b><br/>Every bot tagged with its engine + model. <code>nanobot-nvidia/mistral-l...</code> for Tenet, <code>hermes-google/Gemini-275-flash</code> for Radar, etc. The model behind each lens is visible at all times.</p>
-</td>
-<td width="33%" valign="top">
-<img src="diagrams/council-deliberation.png" alt="Otto delivers an emoji bio. Bob brings a Freudian lens to the same request." />
-<p align="center"><b>The deliberation.</b><br/>Otto ships an artefact (emoji bio). Bob — engine tagged <code>nanobot-nvidia/meta/llama-3.3-70b</code> — opens with <code>[Freud unsaid + ground sense]:</code> and brings the unspoken: "the emoji bio is a 3-layer cake of identity compression."</p>
-</td>
-<td width="33%" valign="top">
-<img src="diagrams/council-artifacts.png" alt="Council ships actual MP3 podcasts back into the chat" />
-<p align="center"><b>The artefacts.</b><br/>The council doesn't just talk. Otto runs <code>blog-to-podcast-pipeline</code> and posts ep003.mp3, ep004.mp3 right back to the chat. Pinned takeaway above. The chat is the audit log <em>and</em> the delivery channel.</p>
-</td>
-</tr>
-</table>
-
----
-
-## The big idea: divide and conquer beats throwing compute at it
-
-Manus.ai gives you a single big agent that does everything by burning a lot of GPU. It's impressive, but it's also slow and expensive, and you can't see why it decided what it did.
-
-A council does the opposite: **break a hard question into eight specialised lenses, each a small model, each cheap.** Then a chair (Tenet) synthesises. The result is often *better* than one giant model, because the room catches what one perspective misses — and you can read the deliberation log to know why.
-
-<p align="center"><img src="diagrams/divide-and-conquer.png" alt="Divide and conquer beats throwing compute at it — one big GPU-cluster model with one opinion per Q vs. nine small specialists (Ana, Civic, Hannah, …) routed through Tenet's synthesis to Otto who ships" width="900" /></p>
-
-This is the trick: **the smallest brain that can hold one specific lens reliably is much cheaper than the biggest brain trying to hold all eight.** And when each bot's lens is locked in via a SOUL prompt, you get specialisation without retraining.
-
----
-
-## Two modes: Council (think) and Factory (ship)
-
-The same nine bots run in **two protocols**, depending on the work:
-
-| Mode | When | How it feels |
-|---|---|---|
-| **Council** *(deliberative)* | "Should I take this contract?" / "What's the shadow here?" / "Make a podcast about waiting" *(content side)* | Lenses debate. Tenet synthesises. Decisions get pinned. Slow, transparent, trust-the-room. |
-| **Factory** *(reactive)* | Daily podcast pipeline. Scheduled videos. Recurring image batches. *"Make a podcast about waiting"* *(rendering side)*. | Router → Blackboard → Workers → Ship → QA. Fast, stateless, fail-fast-and-degrade. |
-
-Council is jazz. Factory is an assembly line. Same musicians, two stages.
-
-→ Full factory architecture: [`docs/12-factory-floor.md`](docs/12-factory-floor.md).
-
----
-
-## What you need
-
-| Thing | Why | Cost |
-|---|---|---|
-| A Mac (or Linux box) with Python 3.11+ | runs the bot gateways | already have it |
-| One Telegram group chat | the council's room | free |
-| One bot token from @BotFather | per justice (9 tokens) | free |
-| API keys to a few free LLM providers | brains for the bots | $0 sustained |
-| Optional: ElevenLabs, OpenAI for media skills | only if you want voice/podcast/image generation | pay-per-use, cheap |
-| Optional: Ollama + phi4-mini locally | last-resort fallback when all cloud providers die | free, slower |
-
-That's it. **No GPU. No Kubernetes. No "platform" subscriptions.**
-
----
-
-## The four engines under the hood
-
-The council is an *interface*. The brains live in four open-source frameworks Dr Non built or contributes to. Each handles a different scale of work:
-
-| Engine | Scale | Use it for |
-|---|---|---|
-| **[`picoclaw`](https://github.com/nonarkara/picoclaw)** | tiny — single-purpose | One bot, one job. Replies in seconds. Fewest moving parts. *Examples: a single justice without tools.* |
-| **[`nanobot`](https://github.com/nonarkara/nanobot)** | small — per-bot gateway | One bot with light tool access (calendar, file, web). Each council justice runs as a nanobot. *9 nanobot processes = the council.* |
-| **[`openclaw`](https://github.com/nonarkara/openclaw)** | medium — skill runner | Handles heavy or recurring work via *skills* (tiktok-wisdom, blog-to-podcast, council-image-gen, pdf-publisher, gdrive-save, etc.). Otto runs on openclaw. |
-| **[`hermes`](https://github.com/nonarkara/hermes)** | large — full personal-assistant gateway | Big context, full tool access, daemons, MCP servers, long-running sessions. Radar runs on hermes. Optional for the council; recommended for daily use. |
-
-Pick the smallest engine that does the job. **Don't run hermes when picoclaw will do.**
-
-<p align="center"><img src="diagrams/04_engine_ladder.svg" alt="Engine Ladder — Pick the Smallest Thing That Works" width="900" /></p>
-
----
-
-## Long-term memory: the Obsidian Brain
-
-Telegram is the council's *working memory* — fast, scrolling, ephemeral. For *long-term memory* you want a file system the bots can read and write across sessions. We use **Obsidian** with a brain-anatomy folder structure:
-
-```
-~/Brain/
-├── Council/         ← session transcripts + pinned decisions
-├── FrontalLobe/     ← strategic notes
-├── Hippocampus/     ← episodic — what happened when
-├── TemporalLobe/    ← semantic — books, blog corpus, podcasts
-├── OccipitalLobe/   ← visual — diagrams, generated artefacts
-├── ParietalLobe/    ← spatial — places, travel
-├── PrefrontalCortex/← drafts, working theories
-├── Amygdala/        ← emotional memory
-└── … 12 more brain regions
-```
-
-After every consequential council turn, **Radar appends a session log** to `~/Brain/Council/sessions/`. Skills drop their artefacts into the matching region (`tiktok-wisdom` → `OccipitalLobe/`, podcasts → `TemporalLobe/`, etc.). Bots with filesystem tools can search the vault before responding — *"what did we decide about X last month?"* surfaces the relevant past session.
-
-Two implementations to choose from:
-
-| Repo | What |
+| Path | In this tree |
 |---|---|
-| **[`agentic-ai-research/brain-vault`](https://github.com/agentic-ai-research/brain-vault)** | The Obsidian vault itself — pure Markdown files, brain-anatomy folders. Read in Obsidian. |
-| **[`Nonarkara/second-brain-v2`](https://github.com/Nonarkara/second-brain-v2)** | Next.js dashboard reimplementation — webapp with multi-bot Telegram support, neural-memory UI. Runs alongside the vault. |
+| [`docs/`](docs/) | 14 numbered field notes (vision through operating it) plus [`docs/diagrams.md`](docs/diagrams.md) |
+| [`examples/souls/`](examples/souls/) | Three sample SOUL files — Tenet, Bob, Otto. Not a full nine-file dump |
+| [`examples/configs/`](examples/configs/) | One placeholder nanobot template. No live tokens |
+| [`examples/factory/`](examples/factory/) | A small Python factory-floor scaffold (router, blackboard, two workers) |
+| [`scripts/`](scripts/) | `splice-task-routing.py` — splice routing addenda into a SOUL |
+| [`diagrams/`](diagrams/) | Architecture SVGs, factory SVGs, and older screenshots |
+| [`HISTORY.md`](HISTORY.md) | How the first council was stood up, day by day |
+| [`COSTS.md`](COSTS.md) | Operator notes from May 2026 — not a live bill |
 
-→ Full setup + skill catalog: [`docs/10-obsidian-brain.md`](docs/10-obsidian-brain.md).
+The nine justices named in [`docs/01-architecture.md`](docs/01-architecture.md) and [`docs/03-the-bots.md`](docs/03-the-bots.md):
+
+| Bot | Job | Lens (as written in the docs) |
+|---|---|---|
+| **Tenet** | Chair, routes and synthesises | First principles + systems |
+| **Ana** | Duty and practice | Kant + James |
+| **Civic** | Consequences | Mill (and related notes in the bot doc) |
+| **Hannah** | Pattern and category error | Douglas / Malinowski / Tversky |
+| **Bob** | The unsaid + ground sense | Freud + common sense |
+| **Pip** | Form serving function | Rams / Vignelli craft |
+| **noN** | Shadow — what the room will not say | Jung |
+| **Otto** | Executor — skills and artefacts | No lens prefix |
+| **Radar** | Scribe — session log | No lens prefix |
+
+Two protocols, same staff, documented in [`docs/12-factory-floor.md`](docs/12-factory-floor.md):
+
+- **Council** — lenses debate; Tenet pins; you decide.
+- **Factory** — router → blackboard → workers → ship. Recurring production, not jazz.
+
+A related implementation repo exists at [agentic-ai-research/dr-non-diy-ai-council](https://github.com/agentic-ai-research/dr-non-diy-ai-council). A 5-minute health check for a private council is [council-watch](https://github.com/Nonarkara/council-watch). This repository remains the written method.
+
+**This repo is not**
+
+- A live Telegram group, a hosted API, or a demo URL.
+- A Manus / Devin replacement for one-shot “build me a SaaS” work.
+- An official ranking, warning system, or government publication.
+- A dump of bot tokens, provider keys, or a personal Obsidian vault.
+
+Related public work: [OpenClaw setup guide](https://github.com/Nonarkara/dr-non-openclaw-setup), [vibecoding skills](https://github.com/Nonarkara/dr-non-vibecoding-skills), [Non-Cast](https://github.com/Nonarkara/Non-Cast), [offline AI coding](https://github.com/Nonarkara/offline-ai-coding), [second-brain-os](https://github.com/Nonarkara/second-brain-os).
 
 ---
 
-## The cost trick: $0 doctrine
+## Philosophy
 
-Every LLM provider has a free tier. Most people pick one provider and burn through that free tier. **Diversify across many providers, and you get massive aggregate free capacity.**
+**Fork the method, not the secrets.**
 
-Current allocation (verified live, May 2026):
+Copy the room shape: one chat, one lens per bot, CONTENT vs ACTION routing, a chair who pins, a human who decides. Copy the SOUL *shape* (identity rule, lens prefix, anti-duplicate). Do not copy Telegram tokens, provider keys, personal SUBSTRATE paragraphs, group IDs, or anyone else's live host list. If a contribution only works by pasting a secret, it does not belong here.
 
-| Bot | Provider | Model | $/mo |
-|---|---|---|---|
-| **Tenet** ⭐ | Alibaba DashScope | `qwen3-max` | $5–15 (chair gets the heavy brain) |
-| **Civic** | DashScope | `qwen-flash` | <$1 |
-| **Pip** | DashScope | `qwen-flash` | <$1 |
-| **Hannah** | DashScope | `qwen-turbo-latest` | <$1 |
-| **Bob** | OpenRouter (paid) | `deepseek/deepseek-chat-v3.1` | $5–8 |
-| **noN** | OpenRouter (paid) | `meta-llama/llama-3.3-70b-instruct` | $2–3 |
-| **Ana** | Groq | `llama-3.1-8b-instant` | **$0** (30 RPM free tier) |
-| **Otto** | NVIDIA NIM | reliable workhorse | **$0** (1000 req/mo per model free) |
-| **Radar** | Google Gemini | `gemini-2.5-flash` | **$0** (1500 req/day free) |
-| **Total** | | | **~$15–25/month** |
+**One Mac.** The architecture assumes one computer you already own — macOS or Linux in the quickstart, no GPU farm, no Kubernetes. Four engine *names* appear in the docs (picoclaw → nanobot → openclaw → hermes). The rule in [`docs/07-the-frameworks.md`](docs/07-the-frameworks.md) is pick the smallest thing that does the job. If you cannot run a first bot on the machine in front of you, you are overcomplicating it.
 
-Strict-zero variant (use everywhere except Tenet's qwen3-max): about **$5/month**. Pure-zero variant (replace Tenet with `qwen-turbo-latest`): **$0**, with slightly weaker chair reasoning.
+**No black-box rankings.** The council is disagreement you can read, not a score you cannot inspect. Telegram is working memory; Radar writes long-term notes to a local vault (the anatomy is in [`docs/10-obsidian-brain.md`](docs/10-obsidian-brain.md) — the vault itself is not in this tree). Do not turn this pattern into a hidden ranking of people, cities, or answers. If you cannot show which lens said what, you do not have a council.
 
-→ See [`docs/05-providers-zero-cost.md`](docs/05-providers-zero-cost.md) for the full cost-saving playbook.
+**Thai–English as the audience.** Write so a Bangkok operator and an English-speaking learner can use the same method. Toggle language in the products you ship; do not hide a gap. This README is in English with a Thai lede because the SOULs and field notes are English standing orders — the *rooms* they help stand up should speak both.
+
+The $0 doctrine in [`docs/00-the-vision.md`](docs/00-the-vision.md) and [`docs/05-providers-zero-cost.md`](docs/05-providers-zero-cost.md) is a design constraint, not a promise: diversify free tiers, pay only where the chair needs a heavier brain, keep a local fallback ([`docs/06-local-fallback.md`](docs/06-local-fallback.md)). Historical operator notes live in [`COSTS.md`](COSTS.md). They are not a current metric.
+
+Company: **Axiom X Co., Ltd.** Author: **Non Arkaraprasertkul** ([@Nonarkara](https://github.com/Nonarkara)).
 
 ---
 
-## When the cloud dies: phi4-mini fallback
+## Ethical use
 
-If every cloud provider goes down on the same day (rare but happens), the council can still answer using a **local model on your Mac**. We use Microsoft's `phi4-mini-instruct` (3.8B parameters, ~2.4 GB on disk) via Ollama or LM Studio.
+This pattern is for **thinking in the open** and for **public-good civic work**: decisions you can audit, artefacts you can attribute, a room a learner can rebuild without buying a platform. It is not a kit for surveillance, impersonation, or a black-box ranking.
 
-It's slower than cloud (5-10 sec/turn vs <1 sec) and dumber than qwen3-max (it'll miss subtle pattern questions). But it works **with no internet**. Good enough to triage urgent council messages until the cloud comes back.
+The council deliberates. **You decide.** Otto executes after a pin — not instead of a human.
 
-→ See [`docs/06-local-fallback.md`](docs/06-local-fallback.md) for setup.
+**Do**
+
+- Keep tokens and API keys in env files or local configs. Never commit them. The template in [`examples/configs/nanobot-template.json`](examples/configs/nanobot-template.json) is placeholders only.
+- Label generated media as generated. A factory MP3 is an artefact, not an official broadcast.
+- Read [`docs/09-failure-modes.md`](docs/09-failure-modes.md) and [`docs/13-operating-it-for-real.md`](docs/13-operating-it-for-real.md) before leaving anything unattended. A probe that does not exercise the path that breaks is a lie.
+- Give Otto the smallest engine and the tightest exec policy you can live with. A bot with a shell is a service account.
+- Attribute upstream models and data. The lens is a prompt; the weights belong to whoever trained them.
+
+**Do not**
+
+- Treat council output as legal, medical, or official government advice.
+- Imply depa, ASEAN, a municipality, or a UN body runs this room.
+- Commit bot tokens, provider keys, AccessKey pairs, group chat IDs, or a personal vault.
+- Ship mock deliberation as a live transcript, or hide an empty factory behind “shipped.”
+- Rank cities, people, or answers behind a score you cannot show the method for.
+- Point Otto at other people's machines, inboxes, or cameras.
+
+If you are unsure whether a string is a secret, it is — leave it out.
 
 ---
 
-## Quick start
+## How to use / learn
+
+This repository is the map. Clone it, read it, then stand up **your** room with **your** tokens.
 
 ```bash
-# 1. Clone the implementation repo (this repo is docs; that one has code)
-git clone https://github.com/agentic-ai-research/dr-non-diy-ai-council.git
-cd dr-non-diy-ai-council
-
-# 2. Set up one bot first — start with picoclaw, simplest
-pip install picoclaw
-# follow examples/picoclaw/
-
-# 3. When that bot answers in your Telegram, scale up:
-#    Add nanobot for the 9 justices, openclaw for Otto, hermes for Radar
-# 4. Wire in free providers — the playbook is in docs/05-providers-zero-cost.md
-# 5. Drop SOULs (system prompts) per justice — examples/souls/
-# 6. Watch the room come alive
+git clone https://github.com/Nonarkara/dr-non-agentic-ai-council.git
+cd dr-non-agentic-ai-council
 ```
 
-Full step-by-step: [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md).
-
----
-
-## What a summer of running it unattended actually taught me
-
-Building this is the easy half. Keeping it alive on one laptop, overnight,
-without a human watching, is where the real lessons are — and almost none of
-them were in the code I thought I was debugging.
-
-A sample of what's in [`docs/13-operating-it-for-real.md`](docs/13-operating-it-for-real.md):
-
-- **The health check that lied.** A monitor logged `OK: alive` every five
-  minutes straight through a total outage, because it probed an endpoint that
-  answers instantly whether or not inference works. *A probe must exercise the
-  path that breaks.*
-- **The probe that caused the outage it was detecting.** Fixing the above meant
-  running real inference — which loads a 3GB model and pins it for five
-  minutes. On a 16GB machine, the health check was starving the very service
-  it existed to protect. *A check that reserves a resource is part of the
-  system it measures.*
-- **198 restarts that restarted nothing.** `open -a App` is a no-op when the
-  app is already running, and the kill list only had the child process. The
-  parent survived, nothing respawned, and it repeated all day — silently.
-- **A full disk broke the local models.** Generation failed with
-  `Remote end closed connection`. Every model-side theory was wrong: swap
-  lives on the boot volume, the disk was at 1.4GB, and the KV-cache allocation
-  had nowhere to grow. *Check `df` before you touch model parameters.*
-- **Free tiers are not redundancy.** Three free providers is one failure mode
-  wearing three hats. Count independent failure modes, not vendors.
-- **Resumability makes retries free.** Skip to the expensive intermediate if it
-  already exists, and a nightly job can safely retry four times before
-  delivery instead of missing a morning.
-
-The through-line: **the failure is almost never where the alarm is pointing**,
-and nearly every bug shared one shape — *something reported success while doing
-nothing useful.*
-
----
-
-## What this repo contains
-
-| File | What |
+| If you want… | Open |
 |---|---|
-| [`docs/00-the-vision.md`](docs/00-the-vision.md) | Why a council beats a single big model |
-| [`docs/01-architecture.md`](docs/01-architecture.md) | The 9 bots + 4 engines, in detail |
-| [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md) | Zero to first council message, ~30 minutes |
-| [`docs/03-the-bots.md`](docs/03-the-bots.md) | Each justice's lens, archetype, philosophical thinker |
-| [`docs/04-task-routing.md`](docs/04-task-routing.md) | CONTENT-vs-ACTION + anti-duplicate rules at the SOUL level |
-| [`docs/05-providers-zero-cost.md`](docs/05-providers-zero-cost.md) | The provider stack at $0; signups; cost tricks |
-| [`docs/06-local-fallback.md`](docs/06-local-fallback.md) | phi4-mini via Ollama for offline / outage scenarios |
-| [`docs/07-the-frameworks.md`](docs/07-the-frameworks.md) | When to use picoclaw / nanobot / openclaw / hermes |
-| [`docs/08-skills.md`](docs/08-skills.md) | Skills openclaw can run — tiktok-wisdom, podcast, image-gen |
-| [`docs/09-failure-modes.md`](docs/09-failure-modes.md) | What goes wrong, what to do, how the SOULs prevent it |
-| [`docs/10-obsidian-brain.md`](docs/10-obsidian-brain.md) | The Obsidian vault as long-term memory — `agentic-ai-research/brain-vault` + `Nonarkara/second-brain-v2` |
-| [`docs/11-storytelling-patterns.md`](docs/11-storytelling-patterns.md) | Escaping the *"I remember standing on a corner…"* LLM cliché — mine your own openings, load them as a brain reference |
-| [`docs/diagrams.md`](docs/diagrams.md) | All 6 architecture diagrams in GitHub-rendered Mermaid — system map, turn flow, roles, engine ladder, routing tree, memory flow |
-| [`docs/12-factory-floor.md`](docs/12-factory-floor.md) | The **executor mode** — same nine bots, reactive pipeline (Router → Blackboard → Workers → Ship → QA). Use the council to *think*; use the factory to *ship* |
-| [`docs/13-operating-it-for-real.md`](docs/13-operating-it-for-real.md) | **The field report.** A summer of running this unattended: 13 real incidents, each with its root cause — the health check that lied, the probe that caused the outage it was detecting, the 198 restarts that restarted nothing, and the full disk that broke the local models |
-| [`HISTORY.md`](HISTORY.md) | How this got built — twelve days from "bored in a Singapore hotel" to a 9-bot daily-use council |
-| [`COSTS.md`](COSTS.md) | Real May 2026 monthly bill breakdown |
-| [`examples/`](examples/) | Sanitised configs, persona prompts, SOUL templates |
-| [`scripts/`](scripts/) | Helpers — diversify providers, splice SOULs, swap models |
+| Why a room beats one fat model | [`docs/00-the-vision.md`](docs/00-the-vision.md) |
+| The nine bots and four engines | [`docs/01-architecture.md`](docs/01-architecture.md) · [`docs/03-the-bots.md`](docs/03-the-bots.md) |
+| First three bots in Telegram | [`docs/02-setup-quickstart.md`](docs/02-setup-quickstart.md) |
+| CONTENT vs ACTION, anti-duplicate | [`docs/04-task-routing.md`](docs/04-task-routing.md) |
+| Provider stack and local fallback | [`docs/05-providers-zero-cost.md`](docs/05-providers-zero-cost.md) · [`docs/06-local-fallback.md`](docs/06-local-fallback.md) |
+| Which engine for which job | [`docs/07-the-frameworks.md`](docs/07-the-frameworks.md) |
+| Skills Otto can run | [`docs/08-skills.md`](docs/08-skills.md) |
+| What breaks | [`docs/09-failure-modes.md`](docs/09-failure-modes.md) · [`docs/13-operating-it-for-real.md`](docs/13-operating-it-for-real.md) |
+| Long-term memory shape | [`docs/10-obsidian-brain.md`](docs/10-obsidian-brain.md) |
+| Voice that is not a cliché | [`docs/11-storytelling-patterns.md`](docs/11-storytelling-patterns.md) |
+| Executor mode | [`docs/12-factory-floor.md`](docs/12-factory-floor.md) · [`examples/factory/`](examples/factory/) |
+| Editable diagrams | [`docs/diagrams.md`](docs/diagrams.md) |
+| The twelve-day origin | [`HISTORY.md`](HISTORY.md) |
+
+A practical first path:
+
+1. Read the vision and the architecture.
+2. Copy a sample SOUL from [`examples/souls/`](examples/souls/) and rewrite the SUBSTRATE as *your* thinking. Start with Tenet.
+3. Follow the three-bot quickstart (Tenet, Ana, Otto). Promote each bot in the group so it can read the room. Put keys in local config — never in git.
+4. When the room answers, add lenses. Use [`scripts/splice-task-routing.py`](scripts/splice-task-routing.py) if you need the routing addenda spliced in.
+5. For recurring artefacts, read the factory doc and try [`examples/factory/README.md`](examples/factory/README.md). That scaffold reads `OPENAI_API_KEY` and optional `ELEVENLABS_API_KEY` from the environment and degrades if a key is missing.
+
+Do not paste a real token into a chat with an agent and ask it to “just finish setup.” You type every credential.
 
 ---
 
-## Who built this
+## System diagram
 
-[**Dr Non Arkara**](https://github.com/nonarkara) — Harvard PhD, MIT-trained architect, Bangkok smart-city researcher.
+Short labels so GitHub Mermaid does not clip.
 
-Built this because I wanted a thinking room more than I wanted a smarter assistant. Open-sourcing it because the architecture matters more than the bots.
+```mermaid
+flowchart LR
+  You --> Chat
+  Chat --> Chair
+  Chat --> Lenses
+  Lenses --> Chair
+  Chair --> Ship
+  Ship --> Chat
+  Chat --> Scribe
+  Scribe --> Vault
+```
 
-Council in action: [@nonarkara on Twitter](https://twitter.com/nonarkara), [council snippets blog](https://nonharvard.com/).
+Chair is Tenet. Lenses are Ana, Civic, Hannah, Bob, Pip, noN. Ship is Otto. Scribe is Radar. Chat is the Telegram group. Vault is a local folder tree — not in this repo.
+
+Factory mode (same staff, different protocol):
+
+```mermaid
+flowchart LR
+  Req --> Router
+  Router --> Board
+  Board --> Work
+  Work --> File
+  File --> QA
+```
 
 ---
 
-## License
+## License / contributing
 
-MIT. Take the architecture, the SOULs, the prompts, the scripts. Build your own council. Tell me what you change — I'll learn from it.
+This repository is licensed under the [MIT License](LICENSE). Copyright © 2026 **Non Arkaraprasertkul / Axiom X Co., Ltd.**
+
+Reuse the architecture, SOUL shapes, scripts, and prose with attribution. MIT here does not relicense upstream models, Telegram, provider APIs, or private implementations named as examples.
+
+**Contributing.** Open a pull request against `main`.
+
+- Add a note when it has already been run, not when it sounds wise.
+- Pair every rule with a *why*. Agents tidy oddities; they need the reason it is load-bearing.
+- No secrets, live tokens, private hosts, or invented metrics.
+- Keep the voice: production, not theory; civic, not vendor pitch.
+- Fixes to ethics, missing anti-patterns, and stale engine names are as welcome as new field notes.
+
+If you stand up a room with this, the author would like to see what you changed.

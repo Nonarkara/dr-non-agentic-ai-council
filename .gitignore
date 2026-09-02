@@ -27,10 +27,13 @@ venv/
 *.jpg
 *.jpeg
 
-# But DO commit hero diagrams + screenshots in diagrams/
+# But DO commit hero diagrams + screenshots in diagrams/ and docs/
 !diagrams/*.png
 !diagrams/*.jpg
 !diagrams/*.jpeg
+!docs/*.png
+!docs/*.jpg
+!docs/*.jpeg
 
 # Backups created by scripts
 *.bak
