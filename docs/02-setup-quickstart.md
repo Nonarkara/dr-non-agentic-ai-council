@@ -28,7 +28,7 @@ pip install --user nanobot
    - `@yourname_tenet_bot`
    - `@yourname_ana_bot`
    - `@yourname_otto_bot`
-4. Save each bot token. They look like `8543196604:AAH...` — keep them in a notes file for now (we'll move to env files in step 4).
+4. Save each bot token. They look like `<BOT_TOKEN_FROM_BOTFATHER>` — keep them in a notes file for now (we'll move to env files in step 4). Never commit tokens.
 5. Add each bot to your group. Promote each to admin (so it can read all messages, not just `@`-mentions).
 
 ## Step 2 — Get your free LLM provider keys
