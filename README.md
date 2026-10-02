@@ -145,7 +145,7 @@ A practical first path:
 2. Copy a sample SOUL from [`examples/souls/`](examples/souls/) and rewrite the SUBSTRATE as *your* thinking. Start with Tenet.
 3. Follow the three-bot quickstart (Tenet, Ana, Otto). Promote each bot in the group so it can read the room. Put keys in local config — never in git.
 4. When the room answers, add lenses. Use [`scripts/splice-task-routing.py`](scripts/splice-task-routing.py) if you need the routing addenda spliced in.
-5. For recurring artefacts, read the factory doc and try [`examples/factory/README.md`](examples/factory/README.md). That scaffold reads `OPENAI_API_KEY` and optional `ELEVENLABS_API_KEY` from the environment and degrades if a key is missing.
+5. For recurring artefacts, read the factory doc and try [`examples/factory/README.md`](examples/factory/README.md). That scaffold requires `OPENAI_API_KEY` before it starts; missing ElevenLabs credentials skip audio only. Even its “dry” modes call OpenAI. Read the [factory limits](examples/factory/README.md#current-scaffold-limits) before running it.
 
 Do not paste a real token into a chat with an agent and ask it to “just finish setup.” You type every credential.
 

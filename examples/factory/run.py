@@ -74,6 +74,14 @@ def main() -> int:
     # ------------------------------------------------------------------
     print(f"\n[2/4] Router decides…")
     decision = router.route(args.project_id, args.request, work_dir=work_dir)
+    # The router's explicit boolean is the authorization contract. A missing,
+    # malformed or false decision must not reach workers, even without a reason.
+    if not isinstance(decision, dict) or decision.get("auto_ship") is not True:
+        reason = decision.get("blocking_reason") if isinstance(decision, dict) else None
+        blackboard.update_status(args.project_id, "blocked", work_dir=work_dir)
+        print(f"  blocked:      {reason or 'Router did not explicitly permit auto_ship'}")
+        print("  → human approval required; not running workers.")
+        return 0
     print(f"  task_type:    {decision['task_type']}")
     print(f"  pipeline:     {decision['pipeline']}")
     print(f"  auto_ship:    {decision['auto_ship']}")

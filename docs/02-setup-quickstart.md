@@ -1,6 +1,6 @@
 # 02 — Setup quickstart
 
-> Zero to first council message in ~30 minutes.
+> Historical three-bot setup pattern, not a complete install kit. This tree ships Tenet, Bob and Otto SOUL examples; Ana’s SOUL, service templates and a fallback proxy are not included. Budget time to author missing pieces and verify the current engine’s CLI/config rather than treating the commands below as a tested 30-minute install.
 
 We'll walk through the smallest possible council: **3 bots** (Tenet, Ana, Otto), all on free providers. Once that works, scale up to all 9 by repeating the same steps.
 
@@ -17,8 +17,11 @@ python3 --version    # must be 3.11 or newer
 
 # Tools we'll need
 brew install ffmpeg jq
-pip install --user nanobot
+# In an isolated Python environment, after reviewing upstream requirements:
+python -m pip install nanobot-ai
 ```
+
+Current upstream package: [`nanobot-ai`](https://github.com/HKUDS/nanobot/blob/main/docs/quick-start.md). The rest of this page records the original setup shape; confirm multi-instance flags and configuration with your installed version. The Homebrew command above is macOS-oriented. The example gateway bind is broad (`0.0.0.0`); do not adopt it on an unfamiliar network without reviewing exposure and authorization.
 
 ## Step 1 — Make the Telegram group + 3 bots
 
@@ -97,8 +100,7 @@ mkdir -p ~/.nanobot-tenet/workspace ~/.nanobot-ana/workspace ~/.nanobot-otto/wor
 curl -L https://raw.githubusercontent.com/nonarkara/dr-non-agentic-ai-council/main/examples/souls/Tenet.SOUL.md \
   -o ~/.nanobot-tenet/workspace/SOUL.md
 
-curl -L https://raw.githubusercontent.com/nonarkara/dr-non-agentic-ai-council/main/examples/souls/Ana.SOUL.md \
-  -o ~/.nanobot-ana/workspace/SOUL.md
+# Ana.SOUL.md is NOT shipped. Author and review your own before launching Ana.
 
 curl -L https://raw.githubusercontent.com/nonarkara/dr-non-agentic-ai-council/main/examples/souls/Otto.SOUL.md \
   -o ~/.nanobot-otto/workspace/SOUL.md
@@ -116,7 +118,7 @@ NANOBOT_HOME=~/.nanobot-otto  nanobot gateway --bot-name Otto &
 
 Each starts polling Telegram for messages.
 
-For permanent setups, write three launchd plists (macOS) or systemd units (Linux). See [`examples/launchd/`](../examples/launchd/) for templates.
+For permanent setups, author and review your own launchd plists (macOS) or systemd units (Linux). There is no `examples/launchd/` directory in this public tree; service installation is separate work, not a completed step here.
 
 ## Step 6 — Test it
 

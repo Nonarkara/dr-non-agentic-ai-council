@@ -3,6 +3,12 @@
 > When every cloud provider goes down on the same day. Or you're on a plane.
 > Or you just don't trust any of them with the next 10 minutes of thinking.
 
+Local inference is separate from channel connectivity: Telegram still needs a
+network and carries messages off the machine. The snippets below are operator
+patterns, not an offline Telegram implementation. The swap helper rewrites local
+bot configurations and restarts named services; inspect paths and preserve your
+own configuration before considering it.
+
 ## Why local matters
 
 Cloud providers are reliable enough — usually. But the failure modes are correlated: a Cloudflare incident takes out Groq, OpenRouter, and a chunk of NVIDIA in the same hour. A Google Cloud regional outage takes Gemini. AliCloud's been known to have international-endpoint hiccups.
@@ -123,11 +129,11 @@ Run a small local proxy (FastAPI app, ~30 lines) that:
 
 Point all bot configs at `http://localhost:9999/v1`. Bots never know which brain answered. Setup is fiddlier but the failover is automatic.
 
-A starter version of this is in [`scripts/llm-fallback-proxy.py`](../scripts/llm-fallback-proxy.py).
+No `scripts/llm-fallback-proxy.py` is shipped in this tree. This section describes a proposed integration to implement and test, not a helper you can run after cloning.
 
 ### Option 3 — Just keep local always-on for one bot
 
-If you want local in the rotation full-time, point **noN** (the easter-egg bot — low load, occasional speaker) at phi4-mini. He'll only post when the shadow is loud, so the slower local model doesn't bottleneck the council. Bonus: noN's contributions are entirely private to your machine.
+If you want local in the rotation full-time, point **noN** (the easter-egg bot — low load, occasional speaker) at phi4-mini. He'll only post when the shadow is loud, so the slower local model doesn't bottleneck the council. Local inference keeps that model call on the machine; messages and replies still pass through Telegram when you use the Telegram channel.
 
 ```json
 "agents": {

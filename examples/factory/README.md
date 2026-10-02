@@ -22,7 +22,7 @@ The full pipeline:
 1. **Router** classifies the request (task type, pipeline, auto_ship, cost estimate) and writes to the blackboard.
 2. **Script Factory** reads the routing artifact + any research context, loads Dr Non's storytelling brain (`~/Brain/TemporalLobe/storytelling/`), calls gpt-4o-mini, and writes 3–10 segments to `artifacts["script"]`.
 3. **Voice Synthesizer** reads `artifacts["script"]`, calls ElevenLabs with retry+fallback, writes MP3 paths to `artifacts["audio"]`.
-4. All errors go to `state["errors"]` for post-hoc QA. All costs tracked in `state["cost_tracker"]`.
+4. Handled errors and estimated costs are recorded in the blackboard. Some exceptions still escape; this is not complete accounting or production QA.
 
 The storytelling brain is optional — if `~/Brain/TemporalLobe/storytelling/` isn't present, Script Factory uses a compact built-in style block. The pipeline degrades gracefully in both cases.
 
@@ -36,10 +36,18 @@ What's deliberately NOT here:
 
 The pattern for adding any of those: same shape as `voice_synth.py` — a single function that reads the blackboard, does its work, writes its artefact back, logs errors, ships even if degraded.
 
+## Current scaffold limits
+
+`run.py` requires `OPENAI_API_KEY` before creating state. Both `--dry-route` and `--dry-script` make real OpenAI calls; “dry” only skips later stages. With voice credentials configured, the full demo also calls ElevenLabs. The code writes under `~/.openclaw/factory/` unless `--work-dir` is supplied. Reusing a project ID initializes its board again. The optional storytelling path is operator-local and is not shipped.
+
+The runner requires an explicit boolean `auto_ship=true` and no blocking reason before reaching workers; false, missing and malformed decisions stop. This is still not a complete production approval system. The router catches HTTP errors but not every transport/JSON/schema failure. Its cost figures are estimates, not provider invoices or a prepaid spending limit. Keep unattended use blocked until those conditions are tested and fixed in your implementation.
+
+The public scaffold drafts scripts and optionally per-segment audio. It does not implement research, final media assembly, publishing or QA. “Ship” in the broader factory diagrams describes the intended system, not a capability demonstrated by this demo.
+
 ## Prerequisites
 
 ```bash
-# Python 3.11+ (uses tomllib + modern syntax)
+# Python 3.11+ for the documented path; only Python standard-library imports
 python3 --version
 
 # Essential — Router + Script Factory:
@@ -51,7 +59,7 @@ export ELEVEN_VOICE_ID=<your_voice_id>
 export ELEVEN_FALLBACK_VOICE_IDS=<id1>,<id2>   # optional fallback chain
 ```
 
-If you don't have an ElevenLabs key, the demo still runs: Router classifies and Script Factory drafts the script, then the voice step logs "ELEVENLABS_API_KEY missing" and exits cleanly. That's the factory pattern — missing dependencies degrade gracefully, never crash.
+If you don't have an ElevenLabs key, the demo still runs: Router classifies and Script Factory drafts the script, then the voice step logs "ELEVENLABS_API_KEY missing" and exits cleanly. That skips audio; a missing OpenAI key stops the entire demo, and other unhandled errors may still stop it.
 
 ## Run the demo
 
@@ -61,7 +69,7 @@ cd examples/   # NOT examples/factory — run as a module from examples/
 # Full pipeline — Router → Script → Voice:
 python3 -m factory.run --request "podcast ep019 about EU AI Act"
 
-# Router-only dry-run (zero API cost beyond gpt-4o-mini classify):
+# Router only: still a real, billable OpenAI request:
 python3 -m factory.run --request "podcast ep019 about EU AI Act" --dry-route
 
 # Router + Script Factory only (see the script, skip ElevenLabs spend):
@@ -142,7 +150,7 @@ Three rules every worker follows:
 
 1. **Read the blackboard, don't pass arguments.** If you need a prior worker's output, read it from `state["artifacts"]["<key>"]`.
 2. **Track every API call's cost.** `blackboard.add_cost(..., usd=...)` so the Router can enforce budget caps next time.
-3. **Log errors, don't raise.** Catch exceptions, call `blackboard.log_error(...)`, fall back to a degraded output (stub notes, silence-gap audio, last-good-frame video, etc.). The pipeline ships.
+3. **Log errors, don't raise.** Catch exceptions, call `blackboard.log_error(...)`, fall back to a degraded output (stub notes, silence-gap audio, last-good-frame video, etc.). The worker records its result; inspect the artifact and errors before treating it as usable.
 
 ## Why a JSON file instead of Redis
 
@@ -154,7 +162,7 @@ When you outgrow this:
 
 Don't pre-build for scale you don't have. The whole point of the factory floor is producing artefacts cheaply — that includes the infrastructure.
 
-## Testing without burning credits
+## Provider-backed checks (can consume credits)
 
 ```bash
 # Router-only — costs ~$0.0001 per run
