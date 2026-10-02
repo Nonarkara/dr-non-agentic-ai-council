@@ -1,5 +1,7 @@
 # 12 — Factory Floor (the executor mode)
 
+> Architecture and operating doctrine. The public `examples/factory/` scaffold implements only router → script → optional voice, not the full ten-worker system. Its current approval/error-handling limits are documented in [the example README](../examples/factory/README.md#current-scaffold-limits); do not infer enforced gates or publishing from these diagrams.
+
 > Same nine bots. Different protocol. The council *thinks*; the factory *ships*.
 
 The council architecture you've read about so far ([`01-architecture.md`](01-architecture.md), [`04-task-routing.md`](04-task-routing.md)) is **deliberative** — bots debate, lenses argue, Tenet synthesises, *then* Otto acts. That's the right mode for *thinking work* (decisions, analysis, advice, generative writing in your voice).
